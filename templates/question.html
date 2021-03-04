@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>{{ questions }}</h1>
+
+
+  <form action="/answers" method="POST">   
+      <!-- you should have one item like this for every choice -->
+      <p>
+        <input
+            type="radio"
+            name="answer"
+            value="value-goes-here">
+        {{ choices }}
+      </p>
+
+    <button>Continue</button>
+  </form>
+
+{% endblock %}
