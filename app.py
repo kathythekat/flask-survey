@@ -25,23 +25,20 @@ def final():
 @app.route('/questions/<int:post_id>')
 #need URL parameter
 def questions(post_id):
-    questions = survey.questions #array of question objects
+    questions = survey.questions
+    # responses = session['responses']
+    if len(session['responses']) != post_id:
+        flash("Don't go out of order!")
+        return redirect(f"/questions/{len(session['responses'])}")
 
     if len(questions) == len(session['responses']):
         return redirect('/completion')
-    question_list = []
-    choices_list = []
-    
-    for question in questions:
-        question_list.append(question.question)
-        choices_list.append(question.choices)
 
-    #questions is an array of questions object
     return render_template(
         'question.html',
         post_id = post_id,
-        questions = question_list[post_id],
-        choices = choices_list[post_id]
+        questions = questions[post_id].question,
+        choices = questions[post_id].choices
     )
 
 @app.route('/answers', methods = ["POST"])
@@ -49,7 +46,6 @@ def answers():
 
     responses = session['responses']
     responses.append(request.form.get('answer'))
-    print(request.form.get('value'))
     session['responses'] = responses
 
     return redirect(f"/questions/{len(session['responses'])}")
@@ -57,7 +53,6 @@ def answers():
 @app.route('/begin', methods = ['POST'])
 def init():
     session['responses'] = []
-
     return redirect(f'/questions/0')
     
 
