@@ -8,21 +8,27 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 debug = DebugToolbarExtension(app)
 
-responses = []
+#responses = []
 
 @app.route('/')
 def index():
     return render_template(
         'survey_start.html'
     )
+
+@app.route('/completion')
+def final():
+    return render_template(
+        'completion.html'
+    )
     
-@app.route('/questions/<post_id>', methods = ["POST"])
+@app.route('/questions/<int:post_id>')
 #need URL parameter
 def questions(post_id):
-    questions = survey.questions #array
+    questions = survey.questions #array of question objects
 
-    if len(questions) == len(responses):
-        return redirect('/completion.html')
+    if len(questions) == len(session['responses']):
+        return redirect('/completion')
     question_list = []
     choices_list = []
     
@@ -39,14 +45,20 @@ def questions(post_id):
     )
 
 @app.route('/answers', methods = ["POST"])
-#TODO:
-    # append to responses array
-    #get URL parameter: response.form[]
-  
-#append to responses list what user clicked on 
-#if question/0 then go to questions/1
 def answers():
-    return redirect(f'/questions/{len(responses)}')
+
+    responses = session['responses']
+    responses.append(request.form.get('answer'))
+    print(request.form.get('value'))
+    session['responses'] = responses
+
+    return redirect(f"/questions/{len(session['responses'])}")
+
+@app.route('/begin', methods = ['POST'])
+def init():
+    session['responses'] = []
+
+    return redirect(f'/questions/0')
     
 
 
